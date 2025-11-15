@@ -1,3 +1,4 @@
+using System.Collections;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -8,8 +9,10 @@ public class GameManager : MonoBehaviour
     [SerializeField] Duck duck;
     [SerializeField] TextMeshProUGUI titleText;
     [SerializeField] GameObject gameplayGroup;
+    [SerializeField] GameObject narrativeGroup;
     [SerializeField] CareItem[] careItems;
     [SerializeField] Image fillImage;
+    [SerializeField] Image fade;
     internal bool isGameStarted;
     private float gameTimer;
 
@@ -26,12 +29,29 @@ public class GameManager : MonoBehaviour
         if (isGameStarted)
         {
             gameTimer -= Time.deltaTime;
-            if (gameTimer < 0)
+            if (gameTimer <= 0)
             {
                 gameTimer = 0;
             }
 
             fillImage.fillAmount = gameTimer / MaxTime;
+
+            if (gameTimer == 0)
+            {
+                StartCoroutine(GameOutroCoroutine());
+                IEnumerator GameOutroCoroutine()
+                {
+                    Color fadeColor = fade.color;
+                    while (fadeColor.a < 1f)
+                    {
+                        fadeColor.a += 2f * Time.deltaTime;
+                        fade.color = fadeColor;
+                        yield return null;
+                    }
+
+                    narrativeGroup.SetActive(true);
+                }
+            }
         }
     }
 
@@ -44,10 +64,23 @@ public class GameManager : MonoBehaviour
             item.Show();
         }
 
-        isGameStarted = true;
         gameplayGroup.SetActive(true);
-        gameTimer = MaxTime;
-        duck.OnGameStart();
+
+        StartCoroutine(GameIntroCoroutine());
+        IEnumerator GameIntroCoroutine()
+        {
+            Color fadeColor = fade.color;
+            while (fadeColor.a > 0)
+            {
+                fadeColor.a -= 2f * Time.deltaTime;
+                fade.color = fadeColor;
+                yield return null;
+            }
+
+            isGameStarted = true;
+            gameTimer = MaxTime;
+            duck.OnGameStart();
+        }
     }
 
     internal void OnTimerTap()

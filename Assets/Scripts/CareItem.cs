@@ -58,6 +58,6 @@ public class CareItem : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
 
     internal void OnDuckDrop()
     {
-        Debug.Log("APPLY " +  gameObject.name);
+
     }
 }
