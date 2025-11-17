@@ -225,3 +225,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b47c69080b565124aa95805ebed6ce12, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ChoiceButton
+  gameManager: {fileID: 0}
+  choiceText: {fileID: 7408272269399779473}
+  choiceIndex: 0

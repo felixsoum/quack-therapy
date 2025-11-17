@@ -1,16 +1,30 @@
+using TMPro;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
-public class ChoiceButton : MonoBehaviour
+public class ChoiceButton : MonoBehaviour, IPointerClickHandler
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    [SerializeField] GameManager gameManager;
+    [SerializeField] TextMeshProUGUI choiceText;
+    public int choiceIndex;
+
+    public void OnPointerClick(PointerEventData eventData)
     {
-        
+        gameManager.OnChoice(choiceIndex);
     }
 
-    // Update is called once per frame
-    void Update()
+    internal void SetText(string text)
     {
-        
+        choiceText.text = text;
+    }
+
+    internal void Hide()
+    {
+        gameObject.SetActive(false);
+    }
+
+    internal void Show()
+    {
+        gameObject.SetActive(true);
     }
 }

@@ -1,3 +1,4 @@
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -7,10 +8,17 @@ public class CareItem : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
     [SerializeField] CanvasScaler canvasScaler;
     [SerializeField] CanvasGroup canvasGroup;
     [SerializeField] Transform dragParent;
+    [SerializeField] Transform outroTarget;
+    [SerializeField] Image image;
+
+    public int itemIndex;
     Transform originalParent;
     RectTransform myRectTransform;
     private Vector2 originalPosition;
     private bool isDragging;
+    private bool isOutroing;
+
+    internal Sprite GetSprite() => image.sprite;
 
     void Awake()
     {
@@ -25,15 +33,26 @@ public class CareItem : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
 
     public void OnDrag(PointerEventData eventData)
     {
+        if (isOutroing)
+            return;
+
         myRectTransform.anchoredPosition += eventData.delta / canvasScaler.transform.localScale.x;
     }
 
     void Update()
     {
-        if (!isDragging)
+        Vector3 targetPos = myRectTransform.anchoredPosition;
+
+        if (isOutroing)
         {
-            myRectTransform.anchoredPosition = Vector3.Lerp(myRectTransform.anchoredPosition, originalPosition, 5f * Time.deltaTime);
+            targetPos = outroTarget.position;
         }
+        else if (!isDragging)
+        {
+            targetPos = originalPosition;
+        }
+
+        myRectTransform.anchoredPosition = Vector3.Lerp(myRectTransform.anchoredPosition, targetPos, 5f * Time.deltaTime);
     }
 
     internal void Show()
@@ -48,6 +67,9 @@ public class CareItem : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
 
     public void OnBeginDrag(PointerEventData eventData)
     {
+        if (isOutroing)
+            return;
+
         canvasGroup.blocksRaycasts = false;
         isDragging = true;
         transform.parent = dragParent;
@@ -56,13 +78,21 @@ public class CareItem : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
 
     public void OnEndDrag(PointerEventData eventData)
     {
+        if (isOutroing)
+            return;
+
         canvasGroup.blocksRaycasts = true;
         isDragging = false;
-        //transform.parent = originalParent;
     }
 
     internal void OnDuckDrop()
     {
 
+    }
+
+    internal void Outro()
+    {
+        isOutroing = true;
+        transform.parent = originalParent;
     }
 }
