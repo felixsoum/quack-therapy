@@ -7,20 +7,32 @@ public class Duck : MonoBehaviour, IDropHandler, IPointerDownHandler
 {
     [SerializeField] Image image;
     [SerializeField] GameManager gameManager;
+    [SerializeField] Image heart;
     private Coroutine duckFlip;
 
     void Start()
     {
+        FlipDuck(0.5f);
+    }
+
+    private void FlipDuck(float delay, int loop = -1)
+    {
+        if (duckFlip != null)
+        {
+            StopCoroutine(duckFlip);
+        }
+
         duckFlip = StartCoroutine(FlipCoroutine());
         IEnumerator FlipCoroutine()
         {
-            while (true)
+            while (loop == -1 || loop-- > 0)
             {
-                yield return new WaitForSeconds(0.5f);
                 var scale = transform.localScale;
                 scale.x *= -1;
                 transform.localScale = scale;
+                yield return new WaitForSeconds(delay);
             }
+            duckFlip = null;
         }
     }
 
@@ -28,7 +40,13 @@ public class Duck : MonoBehaviour, IDropHandler, IPointerDownHandler
     {
         if (gameManager.isGameStarted)
         {
-            transform.localScale = Vector3.Lerp(transform.localScale, Vector3.one, 5f * Time.deltaTime); 
+            Color heartColor = heart.color;
+            heartColor.a = Mathf.Lerp(heartColor.a, 0, 5f * Time.deltaTime);
+            heart.color = heartColor;
+
+            Vector3 heartScale = heart.transform.localScale;
+            heartScale = Vector3.Lerp(heartScale, Vector3.one * 2f, 5f * Time.deltaTime);
+            heart.transform.localScale = heartScale;
         }
     }
 
@@ -38,8 +56,20 @@ public class Duck : MonoBehaviour, IDropHandler, IPointerDownHandler
         if (careItem == null)
             return;
 
-        transform.localScale = Vector3.one * 1.1f;
         careItem.OnDuckDrop();
+        //HappyDuck();
+        SadDuck();
+    }
+
+    private void SadDuck()
+    {
+        FlipDuck(0.15f, 4);
+    }
+
+    private void HappyDuck()
+    {
+        heart.color = Color.white;
+        heart.transform.localScale = Vector3.one;
     }
 
     internal void OnGameStart()

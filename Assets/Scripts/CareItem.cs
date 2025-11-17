@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -7,6 +6,8 @@ public class CareItem : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
 {
     [SerializeField] CanvasScaler canvasScaler;
     [SerializeField] CanvasGroup canvasGroup;
+    [SerializeField] Transform dragParent;
+    Transform originalParent;
     RectTransform myRectTransform;
     private Vector2 originalPosition;
     private bool isDragging;
@@ -14,6 +15,7 @@ public class CareItem : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
     void Awake()
     {
         myRectTransform = GetComponent<RectTransform>();
+        originalParent = myRectTransform.parent;
     }
 
     void Start()
@@ -48,12 +50,15 @@ public class CareItem : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
     {
         canvasGroup.blocksRaycasts = false;
         isDragging = true;
+        transform.parent = dragParent;
+        transform.SetAsLastSibling();
     }
 
     public void OnEndDrag(PointerEventData eventData)
     {
         canvasGroup.blocksRaycasts = true;
         isDragging = false;
+        //transform.parent = originalParent;
     }
 
     internal void OnDuckDrop()
