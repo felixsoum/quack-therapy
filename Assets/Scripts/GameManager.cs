@@ -1,12 +1,15 @@
 using System.Collections;
 using TMPro;
+using UnityEditor.Rendering;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
 {
     private const float MaxTime = 20f;
     private const float TextSpeed = 30f;
+    private const float HandSpeed = 500f;
     [SerializeField] Duck duck;
     [SerializeField] TextMeshProUGUI titleText;
     [SerializeField] GameObject gameplayGroup;
@@ -24,6 +27,16 @@ public class GameManager : MonoBehaviour
     [SerializeField] ParticleSystem bubblesParticle;
     [SerializeField] Camera mainCam;
 
+    [SerializeField] Transform handLeft;
+    [SerializeField] Transform handLeftTarget;
+    [SerializeField] Transform handLeftTarget2;
+    [SerializeField] Transform handRight;
+    [SerializeField] Transform handRightTarget;
+    [SerializeField] Transform handRightTarget2;
+
+    [SerializeField] TextMeshProUGUI audioText;
+    [SerializeField] AudioSource musicSource;
+
     internal bool isGameStarted;
     private float gameTimerTime;
     private bool isGameEnded;
@@ -31,9 +44,14 @@ public class GameManager : MonoBehaviour
     private int firstChoiceIndex;
     private string choiceFirstWord;
     private string choiceSecondWord;
+    private Vector3 handLeftStartPos;
+    private Vector3 handRightStartPos;
 
     private void Start()
     {
+        handLeftStartPos = handLeft.position;
+        handRightStartPos = handRight.position;
+
         foreach (var careItem in careItems)
         {
             careItem.Hide();
@@ -103,7 +121,7 @@ public class GameManager : MonoBehaviour
             narrativeGroup.SetActive(true);
 
             choiceText.maxVisibleCharacters = 0;
-            string dialogue = "Thanks for taking care of Duckie.\nIt's asleep now...";
+            string dialogue = "Thanks for taking care of Duckie.\nIt's finally sleeping...";
             choiceText.text = dialogue;
             choiceText.enabled = true;
 
@@ -115,7 +133,7 @@ public class GameManager : MonoBehaviour
                 yield return null;
             }
 
-            yield return new WaitForSeconds(3f);
+            yield return new WaitForSeconds(2f);
 
             dialogue = "So what was Duckie missing the most?";
             choiceText.text = dialogue;
@@ -191,9 +209,13 @@ public class GameManager : MonoBehaviour
             choice2.enabled = true;
             SecondChoice();
         }
-        else
+        else if (choiceStage == 2)
         {
             ThirdChoice();
+        }
+        else
+        {
+            SceneManager.LoadScene(0);
         }
         choiceStage++;
     }
@@ -209,9 +231,9 @@ public class GameManager : MonoBehaviour
 
         IEnumerator ThirdChoiceCoroutine()
         {
-            duck.Hide();
             choiceText.maxVisibleCharacters = 0;
-            string dialogue = $"Please take good care of yourself too.\nYou matter so much.\nThank you for being here.";
+
+            string dialogue = $"Please take good care of yourself too.";
             choiceText.text = dialogue;
             choiceText.enabled = true;
 
@@ -223,13 +245,31 @@ public class GameManager : MonoBehaviour
                 yield return null;
             }
 
-            yield return new WaitForSeconds(1f);
+            while (Vector3.Distance(handLeft.position, handLeftStartPos) > 0
+                && Vector3.Distance(handRight.position, handRightStartPos) > 0)
+            {
+                handLeft.position = Vector3.MoveTowards(handLeft.position, handLeftStartPos, HandSpeed * Time.deltaTime);
+                handRight.position = Vector3.MoveTowards(handRight.position, handRightStartPos, HandSpeed * Time.deltaTime);
+                yield return null;
+            }
 
-            //for (int i = 1; i < 3; i++)
-            //{
-            //    choiceButtons[i].Show();
-            //    yield return new WaitForSeconds(0.15f);
-            //}
+            choiceText.rectTransform.localPosition = Vector3.zero;
+            dialogue = $"You matter so much.\nThank you for being here.\nYou have done enough today.";
+            choiceText.text = dialogue;
+            choiceText.enabled = true;
+
+            letterTime = 0;
+            while (letterTime < dialogue.Length)
+            {
+                letterTime += TextSpeed * Time.deltaTime;
+                choiceText.maxVisibleCharacters = (int)letterTime;
+                yield return null;
+            }
+
+            yield return new WaitForSeconds(2f);
+
+            choiceButtons[3].SetText("REPLAY");
+            choiceButtons[3].Show();
         }
     }
 
@@ -238,13 +278,13 @@ public class GameManager : MonoBehaviour
         switch (choiceIndex)
         {
             default:
-                return "FOOD";
-            case 1:
-                return "TIME";
-            case 2:
-                return "LOVE";
-            case 3:
                 return "JOY";
+            case 1:
+                return "REST";
+            case 2:
+                return "PEACE";
+            case 3:
+                return "LOVE";
         }
     }
 
@@ -255,13 +295,19 @@ public class GameManager : MonoBehaviour
             choiceButton.Hide();
         }
 
-        choiceButtons[1].SetText("YES");
-        choiceButtons[2].SetText("NO");
+        choiceButtons[0].SetText("YES");
+        choiceButtons[3].SetText("NO");
 
-        StartCoroutine(FirstChoiceCoroutine());
+        StartCoroutine(SecondChoiceCoroutine());
 
-        IEnumerator FirstChoiceCoroutine()
+        IEnumerator SecondChoiceCoroutine()
         {
+            while (Vector3.Distance(handRight.position, handRightTarget.position) > 0)
+            {
+                handRight.position = Vector3.MoveTowards(handRight.position, handRightTarget.position, HandSpeed * Time.deltaTime);
+                yield return null;
+            }
+
             choiceText.maxVisibleCharacters = 0;
             string dialogue = $"That's right... But what about you?\nDo you have enough {choiceFirstWord} and {choiceSecondWord}?";
             choiceText.text = dialogue;
@@ -275,13 +321,24 @@ public class GameManager : MonoBehaviour
                 yield return null;
             }
 
-            yield return new WaitForSeconds(1f);
-
-            for (int i = 1; i < 3; i++)
+            float timer = 1f;
+            while (timer > 0)
             {
-                choiceButtons[i].Show();
-                yield return new WaitForSeconds(0.15f);
+                handLeft.transform.localScale = Vector3.Lerp(handLeft.transform.localScale, new Vector3(-1.5f, 1.5f, 1.5f), 3f * Time.deltaTime);
+                handRight.transform.localScale = Vector3.Lerp(handRight.transform.localScale, new Vector3(1.5f, 1.5f, 1.5f), 3f * Time.deltaTime);
+
+                handLeft.transform.position = Vector3.MoveTowards(handLeft.transform.position, handLeftTarget2.position, HandSpeed * Time.deltaTime);
+                handRight.transform.position = Vector3.MoveTowards(handRight.transform.position, handRightTarget2.position, HandSpeed * Time.deltaTime);
+
+                yield return null;
+                timer -= Time.deltaTime;
             }
+
+            duck.Hide();
+
+            choiceButtons[0].Show();
+            yield return new WaitForSeconds(0.15f);
+            choiceButtons[3].Show();
         }
     }
 
@@ -292,15 +349,18 @@ public class GameManager : MonoBehaviour
             choiceButton.Hide();
         }
 
-        //choiceButtons[1].SetText("YES");
-        //choiceButtons[2].SetText("NO");
-
         StartCoroutine(FirstChoiceCoroutine());
 
         IEnumerator FirstChoiceCoroutine()
         {
+            while (Vector3.Distance(handLeft.position, handLeftTarget.position) > 0)
+            {
+                handLeft.position = Vector3.MoveTowards(handLeft.position, handLeftTarget.position, HandSpeed * Time.deltaTime);
+                yield return null;
+            }
+
             choiceText.maxVisibleCharacters = 0;
-            string dialogue = " I see... That makes sense.\nWhat about the second most important care?";
+            string dialogue = " I see... That makes sense.\nWhat else did Duckie want?";
             choiceText.text = dialogue;
             choiceText.enabled = true;
 
@@ -328,7 +388,7 @@ public class GameManager : MonoBehaviour
     {
         fade.gameObject.SetActive(true);
         fakeFade.SetActive(false);
-        gameTimer.Hide();
+        gameTimer.Show();
 
         StartCoroutine(GameIntroCoroutine());
         IEnumerator GameIntroCoroutine()
@@ -336,6 +396,20 @@ public class GameManager : MonoBehaviour
             titleText.gameObject.SetActive(false);
             yield return new WaitForSeconds(0.25f);
             OnStartButton();
+        }
+    }
+
+    public void OnMusicClick()
+    {
+        if (musicSource.isPlaying)
+        {
+            musicSource.Pause();
+            audioText.text = "muted";
+        }
+        else
+        {
+            musicSource.Play();
+            audioText.text = "music";
         }
     }
 }

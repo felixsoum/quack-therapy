@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class Duck : MonoBehaviour, IDropHandler, IPointerDownHandler
+public class Duck : MonoBehaviour, IDropHandler
 {
     [SerializeField] Image image;
     [SerializeField] GameManager gameManager;
@@ -188,11 +188,6 @@ public class Duck : MonoBehaviour, IDropHandler, IPointerDownHandler
             StopCoroutine(duckFlip);
             duckFlip = null;
         }
-    }
-
-    public void OnPointerDown(PointerEventData eventData)
-    {
-        gameManager.OnStartButton();
     }
 
     internal void PrepareEndGame()

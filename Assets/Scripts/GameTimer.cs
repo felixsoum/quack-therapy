@@ -23,4 +23,9 @@ public class GameTimer : MonoBehaviour, IPointerDownHandler
     {
         gameObject.SetActive(false);
     }
+
+    internal void Show()
+    {
+        gameObject.SetActive(true);
+    }
 }
