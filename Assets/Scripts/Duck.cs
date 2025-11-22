@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -17,7 +16,6 @@ public class Duck : MonoBehaviour, IDropHandler, IPointerDownHandler
 
     void Start()
     {
-        FlipDuck(0.5f);
         GenerateSolution();
     }
 
@@ -35,7 +33,7 @@ public class Duck : MonoBehaviour, IDropHandler, IPointerDownHandler
             int repeat = UnityEngine.Random.Range(2, 5);
             for (int j = 0; j < repeat; j++)
             {
-                itemSequence.Add(itemIndex[i]); 
+                itemSequence.Add(itemIndex[i]);
             }
         }
 
@@ -65,16 +63,13 @@ public class Duck : MonoBehaviour, IDropHandler, IPointerDownHandler
 
     void Update()
     {
-        if (gameManager.isGameStarted)
-        {
-            Color heartColor = heart.color;
-            heartColor.a = Mathf.Lerp(heartColor.a, 0, 5f * Time.deltaTime);
-            heart.color = heartColor;
+        Color heartColor = heart.color;
+        heartColor.a = Mathf.Lerp(heartColor.a, 0, 5f * Time.deltaTime);
+        heart.color = heartColor;
 
-            Vector3 heartScale = heart.transform.localScale;
-            heartScale = Vector3.Lerp(heartScale, Vector3.one * 2.5f, 5f * Time.deltaTime);
-            heart.transform.localScale = heartScale;
-        }
+        Vector3 heartScale = heart.transform.localScale;
+        heartScale = Vector3.Lerp(heartScale, Vector3.one * 2.5f, 5f * Time.deltaTime);
+        heart.transform.localScale = heartScale;
 
         if (isGameEnded)
         {

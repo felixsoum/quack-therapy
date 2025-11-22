@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 using TMPro;
 using UnityEngine;
@@ -20,6 +19,10 @@ public class GameManager : MonoBehaviour
     [SerializeField] ChoiceButton[] choiceButtons;
     [SerializeField] Image choice1;
     [SerializeField] Image choice2;
+    [SerializeField] RectTransform bubblesOrigin;
+    [SerializeField] ParticleSystem bubblesParticle;
+    [SerializeField] Camera mainCam;
+
     internal bool isGameStarted;
     private float gameTimer;
     private bool isGameEnded;
@@ -33,6 +36,17 @@ public class GameManager : MonoBehaviour
         foreach (var careItem in careItems)
         {
             careItem.Hide();
+        }
+
+        StartCoroutine(ItemIntroCoroutine());
+        IEnumerator ItemIntroCoroutine()
+        {
+            yield return new WaitForSeconds(0.5f);
+            foreach (var careItem in careItems)
+            {
+                careItem.Show();
+                yield return new WaitForSeconds(0.15f);
+            }
         }
     }
 
@@ -53,6 +67,14 @@ public class GameManager : MonoBehaviour
                 EndGameplay();
             }
         }
+    }
+
+    private void LateUpdate()
+    {
+        Vector3 screenPos = bubblesOrigin.position;
+        screenPos.z = 10f;
+        Vector3 pos = mainCam.ScreenToWorldPoint(screenPos);
+        bubblesParticle.transform.position = pos;
     }
 
     private void EndGameplay()
