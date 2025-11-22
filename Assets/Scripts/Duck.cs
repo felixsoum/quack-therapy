@@ -16,6 +16,7 @@ public class Duck : MonoBehaviour, IDropHandler, IPointerDownHandler
     private bool isTutorial = true;
     private int tutorialSequence;
     HashSet<int> usedItems = new();
+    private bool isGameEndingSoon;
 
     void Start()
     {
@@ -87,7 +88,11 @@ public class Duck : MonoBehaviour, IDropHandler, IPointerDownHandler
 
         careItem.OnDuckDrop();
 
-        if (isTutorial)
+        if (isGameEndingSoon)
+        {
+            SadDuck();
+        }
+        else if (isTutorial)
         {
             OnDropInTutorial(careItem);
         }
@@ -188,6 +193,11 @@ public class Duck : MonoBehaviour, IDropHandler, IPointerDownHandler
     public void OnPointerDown(PointerEventData eventData)
     {
         gameManager.OnStartButton();
+    }
+
+    internal void PrepareEndGame()
+    {
+        isGameEndingSoon = true;
     }
 
     internal void EndGame()

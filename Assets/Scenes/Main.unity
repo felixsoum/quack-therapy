@@ -286,11 +286,11 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 0}
-  m_Type: 0
+  m_Sprite: {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
+  m_Type: 3
   m_PreserveAspect: 0
   m_FillCenter: 1
-  m_FillMethod: 4
+  m_FillMethod: 0
   m_FillAmount: 1
   m_FillClockwise: 1
   m_FillOrigin: 0
@@ -317,6 +317,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GameTimer
   gameManager: {fileID: 153981063}
+  fillImage: {fileID: 1746921321}
+  backgroundFillImage: {fileID: 35118352}
 --- !u!1 &96268724
 GameObject:
   m_ObjectHideFlags: 0
@@ -390,8 +392,7 @@ MonoBehaviour:
   - {fileID: 2120852207}
   - {fileID: 1801189171}
   - {fileID: 412171067}
-  timerObject: {fileID: 35118350}
-  fillImage: {fileID: 1746921321}
+  gameTimer: {fileID: 35118354}
   fade: {fileID: 1135050315}
   fakeFade: {fileID: 1639075163}
   choiceText: {fileID: 1585605025}

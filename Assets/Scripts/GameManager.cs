@@ -12,8 +12,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] GameObject gameplayGroup;
     [SerializeField] GameObject narrativeGroup;
     [SerializeField] CareItem[] careItems;
-    [SerializeField] GameObject timerObject;
-    [SerializeField] Image fillImage;
+    [SerializeField] GameTimer gameTimer;
     [SerializeField] Image fade;
     [SerializeField] GameObject fakeFade;
 
@@ -26,7 +25,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] Camera mainCam;
 
     internal bool isGameStarted;
-    private float gameTimer;
+    private float gameTimerTime;
     private bool isGameEnded;
     int choiceStage;
     private int firstChoiceIndex;
@@ -56,15 +55,15 @@ public class GameManager : MonoBehaviour
     {
         if (isGameStarted && !isGameEnded)
         {
-            gameTimer -= Time.deltaTime;
-            if (gameTimer <= 0)
+            gameTimerTime -= Time.deltaTime;
+            if (gameTimerTime <= 0)
             {
-                gameTimer = 0;
+                gameTimerTime = 0;
             }
 
-            fillImage.fillAmount = gameTimer / MaxTime;
+            gameTimer.Fill(gameTimerTime / MaxTime);
 
-            if (gameTimer == 0)
+            if (gameTimerTime == 0)
             {
                 EndGameplay();
             }
@@ -81,11 +80,18 @@ public class GameManager : MonoBehaviour
 
     private void EndGameplay()
     {
-        duck.EndGame();
         isGameEnded = true;
+        duck.PrepareEndGame();
         StartCoroutine(GameOutroCoroutine());
         IEnumerator GameOutroCoroutine()
         {
+            while (gameTimer.backgroundFillImage.fillAmount > 0)
+            {
+                gameTimer.backgroundFillImage.fillAmount = Mathf.MoveTowards(gameTimer.backgroundFillImage.fillAmount, 0, 2f * Time.deltaTime);
+                yield return null;
+            }
+
+            duck.EndGame();
             Color fadeColor = fade.color;
             while (fadeColor.a < 1f)
             {
@@ -158,14 +164,14 @@ public class GameManager : MonoBehaviour
             }
 
             isGameStarted = true;
-            gameTimer = MaxTime;
+            gameTimerTime = MaxTime;
             duck.OnGameStart();
         }
     }
 
     internal void OnTimerTap()
     {
-        gameTimer -= 5f;
+        gameTimerTime -= 5f;
     }
 
     internal void OnChoice(int choiceIndex)
@@ -322,7 +328,7 @@ public class GameManager : MonoBehaviour
     {
         fade.gameObject.SetActive(true);
         fakeFade.SetActive(false);
-        timerObject.SetActive(true);
+        gameTimer.Hide();
 
         StartCoroutine(GameIntroCoroutine());
         IEnumerator GameIntroCoroutine()
