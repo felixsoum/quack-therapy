@@ -13,6 +13,9 @@ public class Duck : MonoBehaviour, IDropHandler, IPointerDownHandler
     List<int> itemSequence = new();
     private int itemSequenceIndex;
     private bool isGameEnded;
+    private bool isTutorial = true;
+    private int tutorialSequence;
+    HashSet<int> usedItems = new();
 
     void Start()
     {
@@ -84,20 +87,83 @@ public class Duck : MonoBehaviour, IDropHandler, IPointerDownHandler
 
         careItem.OnDuckDrop();
 
-        if (itemSequence[itemSequenceIndex] == careItem.itemIndex)
+        if (isTutorial)
         {
-            HappyDuck();
-            itemSequenceIndex++;
-            itemSequenceIndex %= itemSequence.Count;
+            OnDropInTutorial(careItem);
         }
         else
         {
+            if (itemSequence[itemSequenceIndex] == careItem.itemIndex)
+            {
+                HappyDuck();
+                itemSequenceIndex++;
+                itemSequenceIndex %= itemSequence.Count;
+            }
+            else
+            {
+                SadDuck();
+            }
+        }
+    }
+
+    private void OnDropInTutorial(CareItem careItem)
+    {
+        if (usedItems.Contains(careItem.itemIndex))
+        {
             SadDuck();
+        }
+        else
+        {
+            switch (tutorialSequence)
+            {
+                case 0:
+                    if (usedItems.Count <= 2)
+                    {
+                        usedItems.Add(careItem.itemIndex);
+                        SadDuck();
+                    }
+                    else
+                    {
+                        HappyDuck();
+                        careItem.Hide();
+                        tutorialSequence++;
+                        usedItems.Clear();
+                    }
+                    break;
+                case 1:
+                    HappyDuck();
+                    careItem.Hide();
+                    tutorialSequence++;
+                    break;
+                case 2:
+                    if (usedItems.Count == 0)
+                    {
+                        SadDuck();
+                        usedItems.Add(careItem.itemIndex);
+                    }
+                    else
+                    {
+                        HappyDuck();
+                        careItem.Hide();
+                        usedItems.Clear();
+                        tutorialSequence++;
+                    }
+                    break;
+                case 3:
+                    HappyDuck();
+                    careItem.Hide();
+                    tutorialSequence++;
+                    gameManager.FinishTutorial();
+                    break;
+                default:
+                    break;
+            }
         }
     }
 
     private void SadDuck()
     {
+        transform.localScale = Vector3.one;
         FlipDuck(0.15f, 4);
     }
 
@@ -109,6 +175,8 @@ public class Duck : MonoBehaviour, IDropHandler, IPointerDownHandler
 
     internal void OnGameStart()
     {
+        isTutorial = false;
+
         transform.localScale = Vector3.one;
         if (duckFlip != null)
         {

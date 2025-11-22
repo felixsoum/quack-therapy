@@ -10,6 +10,7 @@ public class CareItem : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
     [SerializeField] Transform dragParent;
     [SerializeField] Transform outroTarget;
     [SerializeField] Image image;
+    [SerializeField] ParticleSystem particles;
 
     public int itemIndex;
     Transform originalParent;
@@ -24,11 +25,11 @@ public class CareItem : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
     {
         myRectTransform = GetComponent<RectTransform>();
         originalParent = myRectTransform.parent;
-    }
-
-    void Start()
-    {
         originalPosition = myRectTransform.anchoredPosition;
+        if (particles != null)
+        {
+            particles.Stop(); 
+        }
     }
 
     public void OnDrag(PointerEventData eventData)
@@ -57,12 +58,20 @@ public class CareItem : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
 
     internal void Show()
     {
+        gameObject.transform.position = originalPosition;
         gameObject.SetActive(true);
+        isDragging = false;
+        canvasGroup.blocksRaycasts = true;
     }
 
     internal void Hide()
     {
+        transform.parent = originalParent;
         gameObject.SetActive(false);
+        if (particles != null)
+        {
+            particles.Stop();
+        }
     }
 
     public void OnBeginDrag(PointerEventData eventData)
@@ -74,6 +83,10 @@ public class CareItem : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
         isDragging = true;
         transform.parent = dragParent;
         transform.SetAsLastSibling();
+        if (particles != null)
+        {
+            particles.Play(); 
+        }
     }
 
     public void OnEndDrag(PointerEventData eventData)
@@ -83,6 +96,10 @@ public class CareItem : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
 
         canvasGroup.blocksRaycasts = true;
         isDragging = false;
+        if (particles != null)
+        {
+            particles.Stop(); 
+        }
     }
 
     internal void OnDuckDrop()

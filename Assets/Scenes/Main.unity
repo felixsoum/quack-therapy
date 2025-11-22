@@ -213,8 +213,8 @@ RectTransform:
   m_LocalScale: {x: 0, y: 0, z: 0}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 1135050314}
   - {fileID: 1767785963}
+  - {fileID: 1135050314}
   - {fileID: 1155873820}
   - {fileID: 1541961850}
   - {fileID: 1566297571}
@@ -263,7 +263,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 1}
   m_AnchorMax: {x: 0.5, y: 1}
-  m_AnchoredPosition: {x: 0, y: -24}
+  m_AnchoredPosition: {x: 0, y: -50}
   m_SizeDelta: {x: 500, y: 10}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &35118352
@@ -390,8 +390,10 @@ MonoBehaviour:
   - {fileID: 2120852207}
   - {fileID: 1801189171}
   - {fileID: 412171067}
+  timerObject: {fileID: 35118350}
   fillImage: {fileID: 1746921321}
   fade: {fileID: 1135050315}
+  fakeFade: {fileID: 1639075163}
   choiceText: {fileID: 1585605025}
   choiceButtons:
   - {fileID: 9131199901319900199}
@@ -1567,7 +1569,7 @@ GameObject:
   - component: {fileID: 1639075165}
   - component: {fileID: 1639075164}
   m_Layer: 0
-  m_Name: Fade
+  m_Name: FakeFade
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2085,7 +2087,7 @@ ParticleSystemRenderer:
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 1
   m_RenderMode: 0
   m_MeshDistribution: 0
   m_SortMode: 0
@@ -2201,7 +2203,7 @@ ParticleSystem:
     startLifetime:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 5
+      scalar: 1
       minScalar: 5
       maxCurve:
         serializedVersion: 2
@@ -2689,7 +2691,7 @@ ParticleSystem:
         m_RotationOrder: 4
     randomizeRotationDirection: 0
     gravitySource: 0
-    maxNumParticles: 5
+    maxNumParticles: 20
     customEmitterVelocity: {x: 0, y: 0, z: 0}
     size3D: 0
     rotation3D: 0
@@ -2955,7 +2957,7 @@ ParticleSystem:
     rateOverTime:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 1
+      scalar: 5
       minScalar: 10
       maxCurve:
         serializedVersion: 2
@@ -6850,7 +6852,7 @@ Transform:
   m_GameObject: {fileID: 1814427415}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 4.38, y: -3.54, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -7111,6 +7113,10 @@ PrefabInstance:
       propertyPath: itemIndex
       value: 2
       objectReference: {fileID: 0}
+    - target: {fileID: 3038287153057438587, guid: 3a832a2b45afba147874a811cad2fbe9, type: 3}
+      propertyPath: particles
+      value: 
+      objectReference: {fileID: 1814427417}
     - target: {fileID: 3038287153057438587, guid: 3a832a2b45afba147874a811cad2fbe9, type: 3}
       propertyPath: dragParent
       value: 

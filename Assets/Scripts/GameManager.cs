@@ -12,8 +12,10 @@ public class GameManager : MonoBehaviour
     [SerializeField] GameObject gameplayGroup;
     [SerializeField] GameObject narrativeGroup;
     [SerializeField] CareItem[] careItems;
+    [SerializeField] GameObject timerObject;
     [SerializeField] Image fillImage;
     [SerializeField] Image fade;
+    [SerializeField] GameObject fakeFade;
 
     [SerializeField] TextMeshProUGUI choiceText;
     [SerializeField] ChoiceButton[] choiceButtons;
@@ -137,8 +139,6 @@ public class GameManager : MonoBehaviour
 
     public void OnStartButton()
     {
-        titleText.enabled = false;
-
         foreach (var item in careItems)
         {
             item.Show();
@@ -152,7 +152,7 @@ public class GameManager : MonoBehaviour
             Color fadeColor = fade.color;
             while (fadeColor.a > 0)
             {
-                fadeColor.a -= 2f * Time.deltaTime;
+                fadeColor.a -= 0.5f * Time.deltaTime;
                 fade.color = fadeColor;
                 yield return null;
             }
@@ -315,6 +315,21 @@ public class GameManager : MonoBehaviour
                 choiceButtons[i].Show();
                 yield return new WaitForSeconds(0.15f);
             }
+        }
+    }
+
+    internal void FinishTutorial()
+    {
+        fade.gameObject.SetActive(true);
+        fakeFade.SetActive(false);
+        timerObject.SetActive(true);
+
+        StartCoroutine(GameIntroCoroutine());
+        IEnumerator GameIntroCoroutine()
+        {
+            titleText.gameObject.SetActive(false);
+            yield return new WaitForSeconds(0.25f);
+            OnStartButton();
         }
     }
 }
