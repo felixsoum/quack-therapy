@@ -11,6 +11,7 @@ public class CareItem : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
     [SerializeField] Transform outroTarget;
     [SerializeField] Image image;
     [SerializeField] ParticleSystem particles;
+    [SerializeField] AudioSource buttonAudio;
 
     public int itemIndex;
     Transform originalParent;
@@ -79,6 +80,7 @@ public class CareItem : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
         if (isOutroing)
             return;
 
+        buttonAudio.Play();
         canvasGroup.blocksRaycasts = false;
         isDragging = true;
         transform.parent = dragParent;

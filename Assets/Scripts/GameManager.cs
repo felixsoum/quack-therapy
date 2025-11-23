@@ -35,6 +35,8 @@ public class GameManager : MonoBehaviour
 
     [SerializeField] TextMeshProUGUI audioText;
     [SerializeField] AudioSource musicSource;
+    [SerializeField] AudioSource buttonAudio;
+    [SerializeField] AudioSource itemAudio;
 
     internal bool isGameStarted;
     private float gameTimerTime;
@@ -97,6 +99,7 @@ public class GameManager : MonoBehaviour
 
     private void EndGameplay()
     {
+        itemAudio.Play();
         isGameEnded = true;
         duck.PrepareEndGame();
         StartCoroutine(GameOutroCoroutine());
@@ -162,6 +165,8 @@ public class GameManager : MonoBehaviour
 
     public void OnStartButton()
     {
+        itemAudio.Play();
+
         foreach (var item in careItems)
         {
             item.Show();
@@ -221,6 +226,8 @@ public class GameManager : MonoBehaviour
 
     private void ThirdChoice()
     {
+        buttonAudio.Play();
+
         foreach (var choiceButton in choiceButtons)
         {
             choiceButton.Hide();
@@ -289,6 +296,9 @@ public class GameManager : MonoBehaviour
 
     private void SecondChoice()
     {
+
+        buttonAudio.Play();
+
         foreach (var choiceButton in choiceButtons)
         {
             choiceButton.Hide();
@@ -343,6 +353,7 @@ public class GameManager : MonoBehaviour
 
     private void FirstChoice()
     {
+        buttonAudio.Play();
         foreach (var choiceButton in choiceButtons)
         {
             choiceButton.Hide();
@@ -400,6 +411,8 @@ public class GameManager : MonoBehaviour
 
     public void OnMusicClick()
     {
+        buttonAudio.Play();
+
         if (musicSource.isPlaying)
         {
             musicSource.Pause();

@@ -9,6 +9,8 @@ public class Duck : MonoBehaviour, IDropHandler
     [SerializeField] Image image;
     [SerializeField] GameManager gameManager;
     [SerializeField] Image heart;
+    [SerializeField] AudioSource quackPosAudio;
+    [SerializeField] AudioSource quackNegAudio;
     private Coroutine duckFlip;
     List<int> itemSequence = new();
     private int itemSequenceIndex;
@@ -168,12 +170,14 @@ public class Duck : MonoBehaviour, IDropHandler
 
     private void SadDuck()
     {
+        quackNegAudio.Play();
         transform.localScale = Vector3.one;
         FlipDuck(0.15f, 4);
     }
 
     private void HappyDuck()
     {
+        quackPosAudio.Play();
         heart.color = Color.white;
         heart.transform.localScale = Vector3.one;
     }
