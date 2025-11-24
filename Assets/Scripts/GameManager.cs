@@ -251,9 +251,12 @@ public class GameManager : MonoBehaviour
                 yield return null;
             }
 
-            while (Vector3.Distance(handLeft.position, handLeftStartPos) > 0
+            float maxTime = 2f;
+            while ((Vector3.Distance(handLeft.position, handLeftStartPos) > 0
                 && Vector3.Distance(handRight.position, handRightStartPos) > 0)
+                &&  maxTime > 0)
             {
+                maxTime -= Time.deltaTime;
                 handLeft.position = Vector3.MoveTowards(handLeft.position, handLeftStartPos, HandSpeed * Time.deltaTime);
                 handRight.position = Vector3.MoveTowards(handRight.position, handRightStartPos, HandSpeed * Time.deltaTime);
                 yield return null;
@@ -311,8 +314,10 @@ public class GameManager : MonoBehaviour
 
         IEnumerator SecondChoiceCoroutine()
         {
-            while (Vector3.Distance(handRight.position, handRightTarget.position) > 0)
+            float maxTimer = 2f;
+            while (Vector3.Distance(handRight.position, handRightTarget.position) > 0 && maxTimer > 0)
             {
+                maxTimer -= Time.deltaTime;
                 handRight.position = Vector3.MoveTowards(handRight.position, handRightTarget.position, HandSpeed * Time.deltaTime);
                 yield return null;
             }
@@ -363,8 +368,10 @@ public class GameManager : MonoBehaviour
 
         IEnumerator FirstChoiceCoroutine()
         {
-            while (Vector3.Distance(handLeft.position, handLeftTarget.position) > 0)
+            float maxTimer = 2f;
+            while (Vector3.Distance(handLeft.position, handLeftTarget.position) > 0 && maxTimer > 0)
             {
+                maxTimer -= Time.deltaTime;
                 handLeft.position = Vector3.MoveTowards(handLeft.position, handLeftTarget.position, HandSpeed * Time.deltaTime);
                 yield return null;
             }
