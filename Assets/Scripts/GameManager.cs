@@ -43,6 +43,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] Thought thought;
 
     [SerializeField] Color[] camColors;
+    [SerializeField] ParticleSystem moodParticles;
     int camColorIndex;
 
     internal bool isGameStarted;
@@ -202,6 +203,7 @@ public class GameManager : MonoBehaviour
                 yield return null;
             }
 
+            moodParticles.Play();
             isGameStarted = true;
             gameTimerTime = MaxTime;
             duck.OnGameStart();
@@ -294,7 +296,7 @@ public class GameManager : MonoBehaviour
 
             yield return new WaitForSeconds(2f);
 
-            choiceButtons[3].SetText("REPLAY");
+            choiceButtons[3].SetText("again?");
             choiceButtons[3].Show();
         }
     }
