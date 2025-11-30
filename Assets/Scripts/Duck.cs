@@ -11,6 +11,7 @@ public class Duck : MonoBehaviour, IDropHandler
     [SerializeField] Image heart;
     [SerializeField] AudioSource quackPosAudio;
     [SerializeField] AudioSource quackNegAudio;
+    [SerializeField] Thought thought;
     private Coroutine duckFlip;
     List<int> itemSequence = new();
     private int itemSequenceIndex;
@@ -27,6 +28,8 @@ public class Duck : MonoBehaviour, IDropHandler
 
     private void GenerateSolution()
     {
+        itemSequence.Clear();
+
         List<int> itemIndex = new();
         for (int i = 0; i < 4; i++)
         {
@@ -36,7 +39,7 @@ public class Duck : MonoBehaviour, IDropHandler
 
         for (int i = 0; i < 4; i++)
         {
-            int repeat = UnityEngine.Random.Range(2, 5);
+            int repeat = 1;// UnityEngine.Random.Range(2, 5);
             for (int j = 0; j < repeat; j++)
             {
                 itemSequence.Add(itemIndex[i]);
@@ -105,6 +108,17 @@ public class Duck : MonoBehaviour, IDropHandler
                 HappyDuck();
                 itemSequenceIndex++;
                 itemSequenceIndex %= itemSequence.Count;
+                if (itemSequenceIndex == 0)
+                {
+                    GenerateSolution();
+                    gameManager.NextLevel();
+                    StartCoroutine(NextLevelCoroutine());
+                    IEnumerator NextLevelCoroutine()
+                    {
+                        yield return new WaitForSeconds(0.15f);
+                        thought.Clear();
+                    }
+                }
             }
             else
             {
@@ -177,6 +191,7 @@ public class Duck : MonoBehaviour, IDropHandler
 
     private void HappyDuck()
     {
+        thought.Fill();
         quackPosAudio.Play();
         heart.color = Color.white;
         heart.transform.localScale = Vector3.one;

@@ -2,8 +2,9 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class CareItem : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
+public class CareItem : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler, IPointerDownHandler
 {
+    private const float DragStartScale = 1.25f;
     [SerializeField] CanvasScaler canvasScaler;
     [SerializeField] CanvasGroup canvasGroup;
     [SerializeField] Transform dragParent;
@@ -54,6 +55,7 @@ public class CareItem : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
         }
 
         myRectTransform.anchoredPosition = Vector3.Lerp(myRectTransform.anchoredPosition, targetPos, 5f * Time.deltaTime);
+        transform.localScale = Vector3.Lerp(transform.localScale, Vector3.one, 5f * Time.deltaTime);
     }
 
     internal void Show()
@@ -112,5 +114,10 @@ public class CareItem : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
     {
         isOutroing = true;
         transform.parent = originalParent;
+    }
+
+    public void OnPointerDown(PointerEventData eventData)
+    {
+        transform.localScale = DragStartScale * Vector3.one;
     }
 }

@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using TMPro;
 using UnityEngine;
@@ -24,6 +25,8 @@ public class GameManager : MonoBehaviour
     [SerializeField] Image choice2;
     [SerializeField] RectTransform bubblesOrigin;
     [SerializeField] ParticleSystem bubblesParticle;
+    [SerializeField] RectTransform feathersOrigin;
+    [SerializeField] ParticleSystem feathersParticle;
     [SerializeField] Camera mainCam;
 
     [SerializeField] Transform handLeft;
@@ -37,6 +40,10 @@ public class GameManager : MonoBehaviour
     [SerializeField] AudioSource musicSource;
     [SerializeField] AudioSource buttonAudio;
     [SerializeField] AudioSource itemAudio;
+    [SerializeField] Thought thought;
+
+    [SerializeField] Color[] camColors;
+    int camColorIndex;
 
     internal bool isGameStarted;
     private float gameTimerTime;
@@ -74,6 +81,8 @@ public class GameManager : MonoBehaviour
     {
         if (isGameStarted && !isGameEnded)
         {
+            mainCam.backgroundColor = Color.Lerp(mainCam.backgroundColor, camColors[camColorIndex], 2f * Time.deltaTime);
+
             gameTimerTime -= Time.deltaTime;
             if (gameTimerTime <= 0)
             {
@@ -91,10 +100,16 @@ public class GameManager : MonoBehaviour
 
     private void LateUpdate()
     {
-        Vector3 screenPos = bubblesOrigin.position;
+        UpdateParticles(bubblesOrigin, bubblesParticle);
+        UpdateParticles(feathersOrigin, feathersParticle);
+    }
+
+    private void UpdateParticles(RectTransform origin, ParticleSystem particles)
+    {
+        Vector3 screenPos = origin.position;
         screenPos.z = 10f;
         Vector3 pos = mainCam.ScreenToWorldPoint(screenPos);
-        bubblesParticle.transform.position = pos;
+        particles.transform.position = pos;
     }
 
     private void EndGameplay()
@@ -102,6 +117,7 @@ public class GameManager : MonoBehaviour
         itemAudio.Play();
         isGameEnded = true;
         duck.PrepareEndGame();
+        thought.Hide();
         StartCoroutine(GameOutroCoroutine());
         IEnumerator GameOutroCoroutine()
         {
@@ -165,6 +181,7 @@ public class GameManager : MonoBehaviour
 
     public void OnStartButton()
     {
+        thought.Clear();        
         itemAudio.Play();
 
         foreach (var item in careItems)
@@ -430,5 +447,11 @@ public class GameManager : MonoBehaviour
             musicSource.Play();
             audioText.text = "music";
         }
+    }
+
+    internal void NextLevel()
+    {
+        camColorIndex++;
+        camColorIndex %= camColors.Length;
     }
 }
