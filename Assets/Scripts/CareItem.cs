@@ -1,8 +1,9 @@
+using System;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class CareItem : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler, IPointerDownHandler
+public class CareItem : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler, IPointerDownHandler, IPointerUpHandler
 {
     private const float DragStartScale = 1.25f;
     [SerializeField] CanvasScaler canvasScaler;
@@ -12,6 +13,10 @@ public class CareItem : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
     [SerializeField] Image image;
     [SerializeField] ParticleSystem particles;
     [SerializeField] AudioSource buttonAudio;
+    [SerializeField] Tapioca[] tapiocas;
+    [SerializeField] RectTransform armBack;
+    [SerializeField] RectTransform armFront;
+    [SerializeField] Sprite baseSprite;
 
     public int itemIndex;
     Transform originalParent;
@@ -19,8 +24,10 @@ public class CareItem : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
     private Vector2 originalPosition;
     private bool isDragging;
     private bool isOutroing;
+    private bool isPointerUpped;
+    GameManager gameManager;
 
-    internal Sprite GetSprite() => image.sprite;
+    internal Sprite GetSprite() => baseSprite != null ? baseSprite : image.sprite;
 
     void Awake()
     {
@@ -29,7 +36,7 @@ public class CareItem : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
         originalPosition = myRectTransform.anchoredPosition;
         if (particles != null)
         {
-            particles.Stop(); 
+            particles.Stop();
         }
     }
 
@@ -38,7 +45,14 @@ public class CareItem : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
         if (isOutroing)
             return;
 
-        myRectTransform.anchoredPosition += eventData.delta / canvasScaler.transform.localScale.x;
+        Vector2 moveDelta = eventData.delta / canvasScaler.transform.localScale.x;
+        myRectTransform.anchoredPosition += moveDelta;
+        foreach (var p in tapiocas)
+        {
+            p.Push(moveDelta);
+        }
+
+        gameManager.CheckDragProximity(myRectTransform.position);
     }
 
     void Update()
@@ -56,6 +70,19 @@ public class CareItem : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
 
         myRectTransform.anchoredPosition = Vector3.Lerp(myRectTransform.anchoredPosition, targetPos, 5f * Time.deltaTime);
         transform.localScale = Vector3.Lerp(transform.localScale, Vector3.one, 5f * Time.deltaTime);
+
+        if (isPointerUpped)
+        {
+            if (armBack != null)
+            {
+                armBack.rotation = Quaternion.Lerp(armBack.rotation, Quaternion.identity, 5f * Time.deltaTime);
+            }
+
+            if (armFront != null)
+            {
+                armFront.rotation = Quaternion.Lerp(armFront.rotation, Quaternion.identity, 5f * Time.deltaTime);
+            }
+        }
     }
 
     internal void Show()
@@ -88,7 +115,7 @@ public class CareItem : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
         transform.SetAsLastSibling();
         if (particles != null)
         {
-            particles.Play(); 
+            particles.Play();
         }
     }
 
@@ -101,13 +128,15 @@ public class CareItem : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
         isDragging = false;
         if (particles != null)
         {
-            particles.Stop(); 
+            particles.Stop();
         }
+
+        gameManager.EndDrag();
     }
 
     internal void OnDuckDrop()
     {
-
+        gameManager.EndDrag();
     }
 
     internal void Outro()
@@ -118,6 +147,28 @@ public class CareItem : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
 
     public void OnPointerDown(PointerEventData eventData)
     {
+        isPointerUpped = false;
+
         transform.localScale = DragStartScale * Vector3.one;
+        if (armBack != null)
+        {
+            armBack.localEulerAngles = new Vector3(0, 0, -90f);
+        }
+
+        if (armFront != null)
+        {
+            armFront.localEulerAngles = new Vector3(0, 0, 90f);
+        }
+    }
+
+    public void OnPointerUp(PointerEventData eventData)
+    {
+        isPointerUpped = true;
+    }
+
+    internal void Init(GameManager gameManager)
+    {
+        Hide();
+        this.gameManager = gameManager;
     }
 }

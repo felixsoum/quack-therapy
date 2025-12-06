@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 using TMPro;
 using UnityEngine;
@@ -44,6 +43,8 @@ public class GameManager : MonoBehaviour
 
     [SerializeField] Color[] camColors;
     [SerializeField] ParticleSystem moodParticles;
+    [SerializeField] Image hoverImage;
+    [SerializeField] GameObject credits;
     int camColorIndex;
 
     internal bool isGameStarted;
@@ -55,6 +56,10 @@ public class GameManager : MonoBehaviour
     private string choiceSecondWord;
     private Vector3 handLeftStartPos;
     private Vector3 handRightStartPos;
+    private bool isTutorialFinished;
+    private bool isHoverCircleOn;
+    private bool isFadingMusicOut;
+    private bool isChoiceLocked;
 
     private void Start()
     {
@@ -63,7 +68,7 @@ public class GameManager : MonoBehaviour
 
         foreach (var careItem in careItems)
         {
-            careItem.Hide();
+            careItem.Init(this);
         }
 
         StartCoroutine(ItemIntroCoroutine());
@@ -80,22 +85,36 @@ public class GameManager : MonoBehaviour
 
     private void Update()
     {
-        if (isGameStarted && !isGameEnded)
+        if (isGameStarted)
         {
-            mainCam.backgroundColor = Color.Lerp(mainCam.backgroundColor, camColors[camColorIndex], 2f * Time.deltaTime);
-
-            gameTimerTime -= Time.deltaTime;
-            if (gameTimerTime <= 0)
+            if (!isGameEnded)
             {
-                gameTimerTime = 0;
+                musicSource.volume = Mathf.MoveTowards(musicSource.volume, 0.5f, 0.5f * Time.deltaTime);
+                mainCam.backgroundColor = Color.Lerp(mainCam.backgroundColor, camColors[camColorIndex], 2f * Time.deltaTime);
+
+                gameTimerTime -= Time.deltaTime;
+                if (gameTimerTime <= 0)
+                {
+                    gameTimerTime = 0;
+                }
+
+                gameTimer.Fill(gameTimerTime / MaxTime);
+
+                if (gameTimerTime == 0)
+                {
+                    EndGameplay();
+                } 
             }
 
-            gameTimer.Fill(gameTimerTime / MaxTime);
-
-            if (gameTimerTime == 0)
+            if (isFadingMusicOut)
             {
-                EndGameplay();
+                musicSource.volume = Mathf.MoveTowards(musicSource.volume, 0, 0.25f * Time.deltaTime);
             }
+        }
+
+        if (!isHoverCircleOn)
+        {
+            hoverImage.color = Color.Lerp(hoverImage.color, new Color(1f, 1f, 1f, 0f), 10f * Time.deltaTime);
         }
     }
 
@@ -167,11 +186,13 @@ public class GameManager : MonoBehaviour
 
             yield return new WaitForSeconds(1f);
 
+            isChoiceLocked = true;
             foreach (var choiceButton in choiceButtons)
             {
                 choiceButton.Show();
                 yield return new WaitForSeconds(0.15f);
             }
+            isChoiceLocked = false;
         }
 
         foreach (var careItem in careItems)
@@ -182,7 +203,7 @@ public class GameManager : MonoBehaviour
 
     public void OnStartButton()
     {
-        thought.Clear();        
+        thought.Clear();
         itemAudio.Play();
 
         foreach (var item in careItems)
@@ -217,6 +238,11 @@ public class GameManager : MonoBehaviour
 
     internal void OnChoice(int choiceIndex)
     {
+        if (isChoiceLocked)
+        {
+            return;
+        }
+
         if (choiceStage == 0)
         {
             firstChoiceIndex = choiceIndex;
@@ -273,7 +299,7 @@ public class GameManager : MonoBehaviour
             float maxTime = 2f;
             while ((Vector3.Distance(handLeft.position, handLeftStartPos) > 0
                 && Vector3.Distance(handRight.position, handRightStartPos) > 0)
-                &&  maxTime > 0)
+                && maxTime > 0)
             {
                 maxTime -= Time.deltaTime;
                 handLeft.position = Vector3.MoveTowards(handLeft.position, handLeftStartPos, HandSpeed * Time.deltaTime);
@@ -298,6 +324,9 @@ public class GameManager : MonoBehaviour
 
             choiceButtons[3].SetText("again?");
             choiceButtons[3].Show();
+
+            yield return new WaitForSeconds(0.5f);
+            credits.SetActive(true);
         }
     }
 
@@ -318,7 +347,6 @@ public class GameManager : MonoBehaviour
 
     private void SecondChoice()
     {
-
         buttonAudio.Play();
 
         foreach (var choiceButton in choiceButtons)
@@ -357,8 +385,8 @@ public class GameManager : MonoBehaviour
             float timer = 1f;
             while (timer > 0)
             {
-                handLeft.transform.localScale = Vector3.Lerp(handLeft.transform.localScale, new Vector3(-1.5f, 1.5f, 1.5f), 3f * Time.deltaTime);
-                handRight.transform.localScale = Vector3.Lerp(handRight.transform.localScale, new Vector3(1.5f, 1.5f, 1.5f), 3f * Time.deltaTime);
+                handLeft.transform.localScale = Vector3.Lerp(handLeft.transform.localScale, new Vector3(-1.5f, 1.5f, 1.5f), 5f * Time.deltaTime);
+                handRight.transform.localScale = Vector3.Lerp(handRight.transform.localScale, new Vector3(1.5f, 1.5f, 1.5f), 5f * Time.deltaTime);
 
                 handLeft.transform.position = Vector3.MoveTowards(handLeft.transform.position, handLeftTarget2.position, HandSpeed * Time.deltaTime);
                 handRight.transform.position = Vector3.MoveTowards(handRight.transform.position, handRightTarget2.position, HandSpeed * Time.deltaTime);
@@ -369,9 +397,11 @@ public class GameManager : MonoBehaviour
 
             duck.Hide();
 
+            isChoiceLocked = true;
             choiceButtons[0].Show();
             yield return new WaitForSeconds(0.15f);
             choiceButtons[3].Show();
+            isChoiceLocked = false;
         }
     }
 
@@ -410,6 +440,7 @@ public class GameManager : MonoBehaviour
 
             yield return new WaitForSeconds(1f);
 
+            isChoiceLocked = true;
             for (int i = 0; i < 4; i++)
             {
                 if (i == firstChoiceIndex)
@@ -417,11 +448,14 @@ public class GameManager : MonoBehaviour
                 choiceButtons[i].Show();
                 yield return new WaitForSeconds(0.15f);
             }
+            isChoiceLocked = false;
         }
     }
 
     internal void FinishTutorial()
     {
+        isTutorialFinished = true;
+        musicSource.Play();
         fade.gameObject.SetActive(true);
         fakeFade.SetActive(false);
         gameTimer.Show();
@@ -432,12 +466,17 @@ public class GameManager : MonoBehaviour
             titleText.gameObject.SetActive(false);
             yield return new WaitForSeconds(0.25f);
             OnStartButton();
+            yield return new WaitForSeconds(40f);
+            isFadingMusicOut = true;
         }
     }
 
     public void OnMusicClick()
     {
         buttonAudio.Play();
+
+        if (!isTutorialFinished)
+            return;
 
         if (musicSource.isPlaying)
         {
@@ -455,5 +494,20 @@ public class GameManager : MonoBehaviour
     {
         camColorIndex++;
         camColorIndex %= camColors.Length;
+    }
+
+    internal void CheckDragProximity(Vector3 position)
+    {
+        float distance = Vector3.Distance(duck.transform.position, position);
+        isHoverCircleOn = distance < 50f;
+        if (isHoverCircleOn)
+        {
+            hoverImage.color = new Color(1f, 1f, 1f, 0.1f);
+        }
+    }
+
+    internal void EndDrag()
+    {
+        isHoverCircleOn = false;
     }
 }
