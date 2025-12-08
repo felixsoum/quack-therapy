@@ -112,12 +112,12 @@ public class Duck : MonoBehaviour, IDropHandler
                 {
                     GenerateSolution();
                     gameManager.NextLevel();
-                    StartCoroutine(NextLevelCoroutine());
-                    IEnumerator NextLevelCoroutine()
-                    {
-                        yield return new WaitForSeconds(0.15f);
-                        thought.Clear();
-                    }
+                    //StartCoroutine(NextLevelCoroutine());
+                    //IEnumerator NextLevelCoroutine()
+                    //{
+                    //    yield return new WaitForSeconds(0.15f);
+                    //    thought.Clear();
+                    //}
                 }
             }
             else
