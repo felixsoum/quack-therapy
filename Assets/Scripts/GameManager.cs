@@ -159,7 +159,7 @@ public class GameManager : MonoBehaviour
             narrativeGroup.SetActive(true);
 
             choiceText.maxVisibleCharacters = 0;
-            string dialogue = "Thanks for taking care of Duckie.\nIt's finally sleeping...";
+            string dialogue = "Thank you for taking such good care of Duckie.\nDuckie is finally sleeping...";
             choiceText.text = dialogue;
             choiceText.enabled = true;
 
@@ -173,7 +173,7 @@ public class GameManager : MonoBehaviour
 
             yield return new WaitForSeconds(2f);
 
-            dialogue = "So what was Duckie missing the most?";
+            dialogue = "So, what do you think Duckie was missing the most?";
             choiceText.text = dialogue;
 
             letterTime = 0;
@@ -284,7 +284,7 @@ public class GameManager : MonoBehaviour
         {
             choiceText.maxVisibleCharacters = 0;
 
-            string dialogue = $"Please take good care of yourself too.";
+            string dialogue = "Please remember to take good care of yourself too.";
             choiceText.text = dialogue;
             choiceText.enabled = true;
 
@@ -308,7 +308,7 @@ public class GameManager : MonoBehaviour
             }
 
             choiceText.rectTransform.localPosition = Vector3.zero;
-            dialogue = $"You matter so much.\nThank you for being here.\nYou have done enough today.";
+            dialogue = "You matter so much.\nThank you for being here.\nYou have done enough today.";
             choiceText.text = dialogue;
             choiceText.enabled = true;
 
@@ -370,7 +370,7 @@ public class GameManager : MonoBehaviour
             }
 
             choiceText.maxVisibleCharacters = 0;
-            string dialogue = $"That's right... But what about you?\nDo you have enough {choiceFirstWord} and {choiceSecondWord}?";
+            string dialogue = $"That sounds right. But what about you?\nDo you have enough {choiceFirstWord} and {choiceSecondWord} in your life?";
             choiceText.text = dialogue;
             choiceText.enabled = true;
 
@@ -426,7 +426,7 @@ public class GameManager : MonoBehaviour
             }
 
             choiceText.maxVisibleCharacters = 0;
-            string dialogue = " I see... That makes sense.\nWhat else did Duckie want?";
+            string dialogue = "I see... That really makes sense.\nWhat else did Duckie want?";
             choiceText.text = dialogue;
             choiceText.enabled = true;
 
