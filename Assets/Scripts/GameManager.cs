@@ -45,6 +45,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] ParticleSystem moodParticles;
     [SerializeField] Image hoverImage;
     [SerializeField] GameObject credits;
+    [SerializeField] GameObject checker;
     int camColorIndex;
 
     internal bool isGameStarted;
@@ -464,6 +465,7 @@ public class GameManager : MonoBehaviour
         IEnumerator GameIntroCoroutine()
         {
             titleText.gameObject.SetActive(false);
+            checker.SetActive(false);
             yield return new WaitForSeconds(0.25f);
             OnStartButton();
             yield return new WaitForSeconds(40f);

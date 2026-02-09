@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -12,6 +11,7 @@ public class CareItem : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
     [SerializeField] Transform outroTarget;
     [SerializeField] Image image;
     [SerializeField] ParticleSystem particles;
+    [SerializeField] bool isParticlesBubbles;
     [SerializeField] AudioSource buttonAudio;
     [SerializeField] Tapioca[] tapiocas;
     [SerializeField] RectTransform armBack;
@@ -34,9 +34,17 @@ public class CareItem : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
         myRectTransform = GetComponent<RectTransform>();
         originalParent = myRectTransform.parent;
         originalPosition = myRectTransform.anchoredPosition;
-        if (particles != null)
+        if (particles != null && !isParticlesBubbles)
         {
             particles.Stop();
+        }
+    }
+
+    void Start()
+    {
+        if (particles != null && isParticlesBubbles)
+        {
+            particles.Play();
         }
     }
 
@@ -126,7 +134,7 @@ public class CareItem : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
 
         canvasGroup.blocksRaycasts = true;
         isDragging = false;
-        if (particles != null)
+        if (particles != null && !isParticlesBubbles)
         {
             particles.Stop();
         }
